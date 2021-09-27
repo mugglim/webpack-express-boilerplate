@@ -6,7 +6,7 @@ import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpackHotMiddleware from 'webpack-hot-middleware';
 import webpackConfig from '../webpack.config.js';
-import userRounter from './routes/user.js';
+import indexRouter from './routes/index.js';
 
 const app = express();
 const compiler = webpack(webpackConfig);
@@ -15,24 +15,23 @@ const __dirname = path.resolve();
 
 app.use(logger('dev'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
-
 app.use(express.static(path.join(__dirname, 'dist')));
-app.use(webpackDevMiddleware(compiler, webpackConfig.devServer));
+app.use(webpackDevMiddleware(compiler, webpackConfig.devServer.devMiddleware));
 app.use(webpackHotMiddleware(compiler));
 
-app.use('/user', userRounter);
+app.use('/', indexRouter);
 
 app.use((req, res, next) => next(createError(404)));
 
 app.use(function (err, req, res, next) {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    res.status(err.status || 500);
-    res.send('Error!!');
+	res.locals.message = err.message;
+	res.locals.error = req.app.get('env') === 'development' ? err : {};
+	res.status(err.status || 500);
+	res.send('Error!!');
 });
 
 app.listen(port, () => {
-    console.log(`running on http://localhost:${port}`);
+	console.log(`running on http://localhost:${port}`);
 });
